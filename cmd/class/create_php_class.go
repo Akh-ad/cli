@@ -3,12 +3,16 @@ package class
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
 )
 
-var className string
+var (
+	className     string
+	outputDirFlag string
+)
 
 // Create a command to create a class
 var (
@@ -34,8 +38,13 @@ class %s {
 }
 
 	`, className)
+
+			if outputDirFlag == "" {
+				outputDirFlag = "."
+			}
+
 			// File name
-			fileName := fmt.Sprintf("%s.php", strings.ToLower(className))
+			fileName := filepath.Join(outputDirFlag, fmt.Sprintf("%s.php", strings.ToLower(className)))
 
 			// Write the content in the file
 			err := writeToFile(fileName, phpContent)
@@ -55,6 +64,8 @@ func AddCreateClassCommand(rootCmd *cobra.Command) {
 	// Add flags for the class creation command
 	createClassCmd.Flags().StringVarP(&className, "name", "n", "", "Classe name (required)")
 	createClassCmd.MarkFlagRequired("name")
+
+	createClassCmd.Flags().StringVarP(&outputDirFlag, "output", "o", "", "Output directory for the PHP file")
 }
 
 func writeToFile(fileName, content string) error {
