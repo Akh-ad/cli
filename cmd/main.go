@@ -1,13 +1,16 @@
 package main
 
 import (
+	"cli/cmd/class"
 	"fmt"
 	"github.com/spf13/cobra"
 )
 
-func main() {
-	var rootCmd = &cobra.Command{Use: "app"}
-	var helloCmd = &cobra.Command{
+var (
+	rootCmd = &cobra.Command{Use: "app"}
+	name    string
+
+	helloCmd = &cobra.Command{
 		Use:   "hello",
 		Short: "Prints 'Hello, World!'",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -15,16 +18,21 @@ func main() {
 		},
 	}
 
-	var name string
-	var personalizedCmd = &cobra.Command{
+	personalizedCmd = &cobra.Command{
 		Use:   "personalized",
 		Short: "Prints a personalized greeting",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("Hello, %s!\n", name)
 		},
 	}
-	personalizedCmd.Flags().StringVarP(&name, "name", "n", "", "Your name")
+)
 
+func init() {
 	rootCmd.AddCommand(helloCmd, personalizedCmd)
+	class.AddCreateClassCommand(rootCmd)
+	personalizedCmd.Flags().StringVarP(&name, "name", "n", "", "Your name")
+}
+
+func main() {
 	rootCmd.Execute()
 }
