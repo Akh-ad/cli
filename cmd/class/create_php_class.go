@@ -27,11 +27,11 @@ var (
 			// php class content
 			phpContent := fmt.Sprintf(`<?php
 
-	namespace App;
+namespace App;
 
-	class %s {
+class %s {
 	
-	}
+}
 
 	`, className)
 			// File name
