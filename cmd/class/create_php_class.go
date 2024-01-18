@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	className     string
-	outputDirFlag string
+	className       string
+	outputDirFlag   string
+	noFunctionsFlag bool
 )
 
 // Create a command to create a class
@@ -20,6 +21,30 @@ var (
 		Use:   "create_class",
 		Short: "Crée une class PHP basique",
 		Run: func(cmd *cobra.Command, args []string) {
+
+			// Ask  user if he needs to add default functions in his class (e.g. __construct)
+			if !noFunctionsFlag {
+				fmt.Print("Do you want add functions | __construct | __toString ? (yes/no)")
+				//Retrieve the user answer
+				var userResponse string
+				fmt.Scanln(&userResponse)
+
+				if userResponse == "oui" {
+					var result string
+					fmt.Println("Choose the functoins what you want")
+					fmt.Scanln(&result)
+
+					options := parseOptions(result)
+
+					for _, option := range options {
+						fmt.Printf("You choose these functions %s to the class \n", option)
+					}
+				}
+
+			} else {
+				fmt.Println("The flag --no-functions is defined, the user do not want a default functions")
+			}
+
 			if className == "" {
 				fmt.Println("Veuillez spécifier un nom de class")
 				return
@@ -89,6 +114,7 @@ func AddCreateClassCommand(rootCmd *cobra.Command) {
 	createClassCmd.MarkFlagRequired("name")
 
 	createClassCmd.Flags().StringVarP(&outputDirFlag, "output", "o", "", "Output directory for the PHP file")
+	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "nf", true, "functions creator for php class")
 }
 
 func writeToFile(fileName, content string) error {
