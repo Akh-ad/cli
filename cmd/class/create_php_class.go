@@ -130,3 +130,14 @@ func writeToFile(fileName, content string) error {
 	}
 	return nil
 }
+
+func parseOptions(input string) []string {
+	// Analys the options
+	options := make([]string, 0)
+	for _, opt := range splitOptions(input) {
+		if opt != "" {
+			options = append(options, opt)
+		}
+	}
+	return options
+}
