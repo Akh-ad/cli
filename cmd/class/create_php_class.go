@@ -141,3 +141,7 @@ func parseOptions(input string) []string {
 	}
 	return options
 }
+
+func splitOptions(input string) []string {
+	return strings.Split(input, ",")
+}
