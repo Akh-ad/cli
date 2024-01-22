@@ -114,7 +114,7 @@ func AddCreateClassCommand(rootCmd *cobra.Command) {
 	createClassCmd.MarkFlagRequired("name")
 
 	createClassCmd.Flags().StringVarP(&outputDirFlag, "output", "o", "", "Output directory for the PHP file")
-	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "nf", true, "functions creator for php class")
+	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "f", true, "functions creator for php class")
 }
 
 func writeToFile(fileName, content string) error {
