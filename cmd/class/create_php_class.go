@@ -29,7 +29,7 @@ var (
 				var userResponse string
 				fmt.Scanln(&userResponse)
 
-				if userResponse == "oui" {
+				if userResponse == "yes" {
 					var result string
 					fmt.Println("Choose the functoins what you want")
 					fmt.Scanln(&result)
