@@ -82,11 +82,13 @@ var (
 namespace %s;
 
 class %s {
-	
-}
 
 	`, namespace, className)
-
+			if !noFunctionsFlag {
+				phpContent += generateConstructorCode()
+				// Close the class
+				phpContent += "}\n"
+			}
 			if outputDirFlag == "" {
 				outputDirFlag = "."
 			}
@@ -106,6 +108,13 @@ class %s {
 	}
 )
 
+func generateConstructorCode() string {
+	return "public function __construct()\n" +
+		"	{\n" +
+		"	}\n"
+
+}
+
 func AddCreateClassCommand(rootCmd *cobra.Command) {
 	rootCmd.AddCommand(createClassCmd)
 
@@ -114,7 +123,7 @@ func AddCreateClassCommand(rootCmd *cobra.Command) {
 	createClassCmd.MarkFlagRequired("name")
 
 	createClassCmd.Flags().StringVarP(&outputDirFlag, "output", "o", "", "Output directory for the PHP file")
-	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "f", true, "functions creator for php class")
+	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "f", false, "functions creator for php class")
 }
 
 func writeToFile(fileName, content string) error {
