@@ -22,34 +22,6 @@ var (
 		Short: "Crée une class PHP basique",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			// Ask  user if he needs to add default functions in his class (e.g. __construct)
-			if !noFunctionsFlag {
-				fmt.Print("Do you want add functions | __construct | __toString ? (yes/no)")
-				//Retrieve the user answer
-				var userResponse string
-				fmt.Scanln(&userResponse)
-
-				if userResponse == "yes" {
-					var result string
-					fmt.Println("Choose the functoins what you want")
-					fmt.Scanln(&result)
-
-					options := parseOptions(result)
-
-					for _, option := range options {
-						fmt.Printf("You choose these functions %s to the class \n", option)
-					}
-				}
-
-			} else {
-				fmt.Println("The flag --no-functions is defined, the user do not want a default functions")
-			}
-
-			if className == "" {
-				fmt.Println("Veuillez spécifier un nom de class")
-				return
-			}
-
 			//Dir Path
 			outputDir, err := filepath.Abs(outputDirFlag)
 			if err != nil {
@@ -71,45 +43,77 @@ var (
 				return
 			}
 
-			// Formate le nom de la class avec la première lettre en maj
-			className := strings.Title(className)
+			// Ask  user if he needs to add default functions in his class (e.g. __construct)
+			if !noFunctionsFlag {
+				fmt.Print("Do you want add functions | __construct | __toString ? (yes/no)")
+				//Retrieve the user answer
+				var userResponse string
+				fmt.Scanln(&userResponse)
 
-			namespace := strings.ReplaceAll(relPath, string(filepath.Separator), "\\")
+				if userResponse == "yes" {
+					options := getFunctionOption()
+					namespace := strings.ReplaceAll(relPath, string(filepath.Separator), "\\")
+					phpContent := generateClassCodeWithFunctions(options, namespace)
+					writeToFile(outputDirFlag, className, phpContent)
+				} else {
+					// User chose not to add any functions
+					fmt.Printf("Creating a class without functions: %s\n", className)
+					className := strings.Title(className)
+					namespace := strings.ReplaceAll(relPath, string(filepath.Separator), "\\")
+					phpContent := generateClassCode(namespace)
+					writeToFile(outputDirFlag, className, phpContent)
+				}
 
-			// php class content
-			phpContent := fmt.Sprintf(`<?php
+			} else {
+				fmt.Println("The flag --no-functions is defined, the user do not want a default functions")
+			}
+
+			if className == "" {
+				fmt.Println("Veuillez spécifier un nom de class")
+				return
+			}
+		},
+	}
+)
+
+func generateClassCode(namespace string) string {
+
+	return fmt.Sprintf(`<?php
 
 namespace %s;
 
 class %s {
 
-	`, namespace, className)
-			if !noFunctionsFlag {
-				phpContent += generateConstructorCode()
-				// Close the class
-				phpContent += "}\n"
-			}
-			if outputDirFlag == "" {
-				outputDirFlag = "."
-			}
+`, namespace, className)
+}
 
-			// File name
-			fileName := filepath.Join(outputDirFlag, fmt.Sprintf("%s.php", strings.ToLower(className)))
+func generateClassCodeWithFunctions(optionsStr, namespace string) string {
+	phpContent := generateClassCode(namespace)
 
-			// Write the content in the file
-			err = writeToFile(fileName, phpContent)
-			if err != nil {
-				fmt.Printf("Erreur lors de la création du fichier %v\n", err)
-				return
-			}
+	options := parseOptions(optionsStr)
 
-			fmt.Printf("Fichier PHP crée avec succès: %s\n", fileName)
-		},
+	for _, option := range options {
+		switch option {
+		case "__construct":
+			phpContent += generateConstructorCode()
+		case "__toString":
+			phpContent += generateToStringCode()
+		}
 	}
-)
+
+	phpContent += "}\n"
+	return phpContent
+}
 
 func generateConstructorCode() string {
 	return "public function __construct()\n" +
+		"	{\n" +
+		"	}\n"
+
+}
+
+func generateToStringCode() string {
+	return "public function __toString()\n" +
 		"	{\n" +
 		"	}\n"
 
@@ -126,7 +130,9 @@ func AddCreateClassCommand(rootCmd *cobra.Command) {
 	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "f", false, "functions creator for php class")
 }
 
-func writeToFile(fileName, content string) error {
+func writeToFile(outputDir, className, content string) error {
+	fileName := filepath.Join(outputDir, fmt.Sprintf("%s.php", strings.ToLower(className)))
+
 	file, err := os.Create(fileName)
 	if err != nil {
 		return err
@@ -138,6 +144,25 @@ func writeToFile(fileName, content string) error {
 		return err
 	}
 	return nil
+}
+
+func getFunctionOption() string {
+	fmt.Println("Choose a function for the class:")
+	fmt.Println("1. __construct")
+	fmt.Println("2. __toString")
+
+	var option string
+	fmt.Scanln(&option)
+
+	switch option {
+	case "1":
+		return "__construct"
+	case "2":
+		return "__toString"
+	default:
+		fmt.Println("Invalid option. Defaulting to __construct.")
+		return "__construct"
+	}
 }
 
 func parseOptions(input string) []string {
