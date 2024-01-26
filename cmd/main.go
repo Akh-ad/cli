@@ -30,6 +30,7 @@ var (
 func init() {
 	rootCmd.AddCommand(helloCmd, personalizedCmd)
 	class.AddCreateClassCommand(rootCmd)
+	class.AddDeleteClassCommand(rootCmd)
 	personalizedCmd.Flags().StringVarP(&name, "name", "n", "", "Your name")
 }
 
