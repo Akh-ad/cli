@@ -56,7 +56,7 @@ var (
 					phpContent := generateClassCodeWithFunctions(options, namespace)
 					writeToFile(outputDirFlag, className, phpContent)
 				} else {
-					// User chose not to add any functions
+					// User choose not to add any functions
 					fmt.Printf("Creating a class without functions: %s\n", className)
 					className := strings.Title(className)
 					namespace := strings.ReplaceAll(relPath, string(filepath.Separator), "\\")
@@ -87,6 +87,7 @@ class %s {
 `, namespace, className)
 }
 
+// call the function who generate the code for the function chosen by the user
 func generateClassCodeWithFunctions(optionsStr, namespace string) string {
 	phpContent := generateClassCode(namespace)
 
@@ -105,6 +106,7 @@ func generateClassCodeWithFunctions(optionsStr, namespace string) string {
 	return phpContent
 }
 
+// genrate the __construct function into the class
 func generateConstructorCode() string {
 	return "public function __construct()\n" +
 		"	{\n" +
@@ -112,6 +114,7 @@ func generateConstructorCode() string {
 
 }
 
+// generate __toString function into the class
 func generateToStringCode() string {
 	return "public function __toString()\n" +
 		"	{\n" +
@@ -130,6 +133,7 @@ func AddCreateClassCommand(rootCmd *cobra.Command) {
 	createClassCmd.Flags().BoolVarP(&noFunctionsFlag, "no-functions", "f", false, "functions creator for php class")
 }
 
+// write to the file that content the class
 func writeToFile(outputDir, className, content string) error {
 	fileName := filepath.Join(outputDir, fmt.Sprintf("%s.php", strings.ToLower(className)))
 
@@ -150,7 +154,7 @@ func getFunctionOption() string {
 	fmt.Println("Choose a function for the class:")
 	fmt.Println("1. __construct")
 	fmt.Println("2. __toString")
-
+	
 	var option string
 	fmt.Scanln(&option)
 
