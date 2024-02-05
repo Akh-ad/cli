@@ -2,6 +2,7 @@ package main
 
 import (
 	"cli/cmd/class"
+	"cli/cmd/doc"
 	"fmt"
 	"github.com/spf13/cobra"
 )
@@ -31,6 +32,7 @@ func init() {
 	rootCmd.AddCommand(helloCmd, personalizedCmd)
 	class.AddCreateClassCommand(rootCmd)
 	class.AddDeleteClassCommand(rootCmd)
+	doc.FuncInfoCommand(rootCmd)
 	personalizedCmd.Flags().StringVarP(&name, "name", "n", "", "Your name")
 }
 
