@@ -47,3 +47,10 @@ func getFunctionInfo(funcName string) {
 	fmt.Println("Description of the function", funcName, ":", description)
 	fmt.Println("Example", funcName, ":", strings.Join(examples, "\n\n"))
 }
+
+func FuncInfoCommand(rootCmd *cobra.Command) {
+	rootCmd.AddCommand(getInfoCmd)
+
+	getInfoCmd.Flags().StringVarP(&funcName, "name", "fn", "", "function name (required)")
+	getInfoCmd.MarkFlagRequired("name")
+}
