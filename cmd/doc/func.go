@@ -26,6 +26,16 @@ var (
 			fmt.Println(functionInfo)
 		},
 	}
+)
+
+func getFunctionInfo(funcName string) {
+
+	docURL := fmt.Sprintf("https://www.php.net/manual/en/function.%s.php", strings.ToLower(funcName))
+
+	doc, err := goquery.NewDocument(docURL)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	description := doc.Find(".refpurpose").First().Text()
 
