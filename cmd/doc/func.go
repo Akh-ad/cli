@@ -10,7 +10,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var funcName string
+var (
+	funcName string
+	moreInfo bool
+)
 
 var (
 	getInfoCmd = &cobra.Command{
@@ -21,14 +24,13 @@ var (
 				fmt.Println("Please specify the function name with the flag --function")
 				os.Exit(1)
 			}
-
 			functionInfo := getFunctionInfo(funcName)
 			fmt.Println(functionInfo)
 		},
 	}
 )
 
-func getFunctionInfo(funcName string)  {
+func getFunctionInfo(funcName string) string {
 
 	docURL := fmt.Sprintf("https://www.php.net/manual/en/function.%s.php", strings.ToLower(funcName))
 
@@ -38,24 +40,47 @@ func getFunctionInfo(funcName string)  {
 	}
 
 	// Use a specific class toextract a content of div
-	doc.Find(".refsect1 description").Each(func(i int, s *goquery.Selection) {
+	var result string
+	doc.Find("div.refnamediv").Each(func(i int, s *goquery.Selection) {
 		content := s.Text()
-		fmt.Println(content)
+		result += content + "\n"
 	})
 
-	examples := make([]string, 0)
-	doc.Find(".example").Each(func(i int, s *goquery.Selection) {
-		examples = append(examples, s.Text())
+	if !moreInfo {
+		result += getMoreFunctionInfo(doc)
+	}
+
+	return result
+}
+
+func getMoreFunctionInfo(doc *goquery.Document) string {
+
+	var result string
+	// Description
+	doc.Find("div.refsect1.description").Each(func(i int, s *goquery.Selection){
+		descriptionContent := s.Text()
+		result += descriptionContent + "\n"
+	})
+	// Parameters
+	doc.Find("div.refsect1.parameters").Each(func(i int, s *goquery.Selection){
+		paramContent := s.Text()
+		result += paramContent + "\n"
+	})
+	// Examples
+	doc.Find("div.refsect1.examples").Each(func(i int, s *goquery.Selection){
+		paramContent := s.Text()
+		result += paramContent + "\n"
 	})
 
-	fmt.Println("Description of the function", funcName, ":", description)
-	fmt.Println("Example", funcName, ":", strings.Join(examples, "\n\n"))
+	return result
 }
 
 func FuncInfoCommand(rootCmd *cobra.Command) {
 	rootCmd.AddCommand(getInfoCmd)
 
-	getInfoCmd.Flags().StringVarP(&funcName, "name", "fn", "", "function name (required)")
+
+	getInfoCmd.Flags().StringVarP(&funcName, "name", "n", "", "function name (required)")
 	getInfoCmd.MarkFlagRequired("name")
+	getInfoCmd.Flags().BoolVarP(&moreInfo, "moreInfos", "m", false  , "more informations about the function")
 }
 
