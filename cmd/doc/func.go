@@ -42,14 +42,6 @@ func getFunctionInfo(funcName string)  {
 		content := s.Text()
 		fmt.Println(content)
 	})
-
-	examples := make([]string, 0)
-	doc.Find(".example").Each(func(i int, s *goquery.Selection) {
-		examples = append(examples, s.Text())
-	})
-
-	fmt.Println("Description of the function", funcName, ":", description)
-	fmt.Println("Example", funcName, ":", strings.Join(examples, "\n\n"))
 }
 
 func FuncInfoCommand(rootCmd *cobra.Command) {
