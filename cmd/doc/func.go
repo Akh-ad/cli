@@ -28,7 +28,7 @@ var (
 	}
 )
 
-func getFunctionInfo(funcName string)  {
+func getFunctionInfo(funcName string) string {
 
 	docURL := fmt.Sprintf("https://www.php.net/manual/en/function.%s.php", strings.ToLower(funcName))
 
@@ -38,16 +38,18 @@ func getFunctionInfo(funcName string)  {
 	}
 
 	// Use a specific class toextract a content of div
-	doc.Find(".refsect1 description").Each(func(i int, s *goquery.Selection) {
+	var result string
+	doc.Find("div.refnamediv").Each(func(i int, s *goquery.Selection) {
 		content := s.Text()
-		fmt.Println(content)
+		result += content + "\n"
 	})
+	return result
 }
 
 func FuncInfoCommand(rootCmd *cobra.Command) {
 	rootCmd.AddCommand(getInfoCmd)
 
-	getInfoCmd.Flags().StringVarP(&funcName, "name", "fn", "", "function name (required)")
+	getInfoCmd.Flags().StringVarP(&funcName, "name", "n", "", "function name (required)")
 	getInfoCmd.MarkFlagRequired("name")
 }
 
