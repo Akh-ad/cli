@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"strings"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/spf13/cobra"
 )
@@ -14,6 +13,7 @@ import (
 var (
 	funcName string // The name of the PHP function to retrieve information about
 	moreInfo bool   // Flag to indicate if more detailed information should be displayed
+	writeToFile bool // Flag to indicate if a temporary file will be create to add the doc into
 )
 
 // Definition of the `get-info` command
@@ -30,6 +30,11 @@ var (
 			// Retrieve the function information and print it
 			functionInfo := getFunctionInfo(funcName)
 			fmt.Println(functionInfo)
+
+			// Conditionally write the information to a temporary file
+			if writeToFile {
+				WriteFunctionInfoToFile(functionInfo)
+			} 
 		},
 	}
 )
@@ -94,4 +99,5 @@ func FuncInfoCommand(rootCmd *cobra.Command) {
 	getInfoCmd.Flags().StringVarP(&funcName, "name", "n", "", "function name (required)")
 	getInfoCmd.MarkFlagRequired("name") // Make the "name" flag required
 	getInfoCmd.Flags().BoolVarP(&moreInfo, "moreInfos", "m", false, "more information about the function")
+	getInfoCmd.Flags().BoolVarP(&writeToFile, "write-to-file", "w", false, "write information to a temporary file")
 }
